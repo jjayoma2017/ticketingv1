@@ -1,9 +1,9 @@
-import { Message } from 'node-nats-streaming';
-import mongoose from 'mongoose';
-import { TicketUpdatedEvent } from '@jtjticketing/common';
-import { TicketUpdatedListener } from '../ticket-updated-listener';
-import { natsWrapper } from '../../../nats-wrapper';
-import { Ticket } from '../../../models/ticket';
+import { Message } from "node-nats-streaming";
+import mongoose from "mongoose";
+import { TicketUpdatedEvent } from "@jtjticketing/common";
+import { TicketUpdatedListener } from "../ticket-updated-listener";
+import { natsWrapper } from "../../../nats-wrapper";
+import { Ticket } from "../../../models/ticket";
 
 const setup = async () => {
   // create an instance of the listener
@@ -12,16 +12,16 @@ const setup = async () => {
   // craete and save a ticket
   const ticket = Ticket.build({
     id: new mongoose.Types.ObjectId().toHexString(),
-    title: 'concert',
+    title: "concert",
     price: 20,
   });
   await ticket.save();
 
   // create a fake data object
-  const data: TicketUpdatedEvent['data'] = {
+  const data: TicketUpdatedEvent["data"] = {
     version: ticket.version + 1,
     id: ticket.id,
-    title: 'concert 2',
+    title: "concert 2",
     price: 22,
     userId: new mongoose.Types.ObjectId().toHexString(),
   };
@@ -34,7 +34,7 @@ const setup = async () => {
   return { listener, data, msg, ticket };
 };
 
-it('finds,updates and saves a ticket', async () => {
+it("finds,updates and saves a ticket", async () => {
   // call the onMessage function with the data object + message object
   const { listener, data, msg, ticket } = await setup();
   await listener.onMessage(data, msg);
@@ -45,11 +45,22 @@ it('finds,updates and saves a ticket', async () => {
   expect(updatedTicket!.version).toEqual(data.version);
 });
 
-it('acks the message', async () => {
+it("acks the message", async () => {
   const { listener, data, msg } = await setup();
   // call the onMessage function with the data object + message object
 
   await listener.onMessage(data, msg);
   // write assertions to make sure act function is called
   expect(msg.ack).toHaveBeenCalled();
+});
+
+it("does not call ack if the event has a skipped version number", async () => {
+  const { msg, data, listener, ticket } = await setup();
+
+  data.version = 10;
+  try {
+    await listener.onMessage(data, msg);
+  } catch (error) {}
+
+  expect(msg.ack).not.toHaveBeenCalled();
 });
