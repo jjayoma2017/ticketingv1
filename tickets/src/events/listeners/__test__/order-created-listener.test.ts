@@ -30,10 +30,27 @@ const setup = async () => {
       price: ticket.price,
     },
   };
-  // @ts-ignore
+  // @ts-ignorecd
   const msg: Message = {
     ack: jest.fn(),
   };
 
   return { listener, ticket, data, msg };
 };
+
+it('sets the userId of the ticket', async () => {
+  const { listener, ticket, data, msg } = await setup();
+
+  await listener.onMessage(data, msg);
+
+  const updatedTicket = await Ticket.findById(ticket.id);
+
+  expect(updatedTicket!.orderId).toEqual(data.id);
+});
+
+it('acks the message', async () => {
+  const { listener, ticket, data, msg } = await setup();
+  await listener.onMessage(data, msg);
+
+  expect(msg.ack).toHaveBeenCalled();
+});
