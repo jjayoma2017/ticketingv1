@@ -1,0 +1,19 @@
+{
+  "name": "ticketingv1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "skaffold": "(skaffold dev -v=info --kube-context=docker-for-desktop --port-forward --cache-artifacts=true)"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jjayoma2017/ticketingv1.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jjayoma2017/ticketingv1/issues"
+  },
+  "homepage": "https://github.com/jjayoma2017/ticketingv1#readme"
+}
