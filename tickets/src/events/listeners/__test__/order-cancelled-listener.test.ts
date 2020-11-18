@@ -27,7 +27,7 @@ const setup = async () => {
       id: ticket.id,
     },
   };
-  // @ts-ignorecd
+  // @ts-ignore
   const msg: Message = {
     ack: jest.fn(),
   };
